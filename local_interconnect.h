@@ -196,7 +196,7 @@ class dxbar_router {
     dPacket(void* m_req, unsigned m_output_deviceID) {
       req = m_req;
       output_deviceID = m_output_deviceID;
-      counter = 100;
+      counter = 0;
     }
     void* req;
     unsigned output_deviceID;

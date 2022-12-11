@@ -380,6 +380,8 @@ bool LocalInterconnect::HasBuffer(unsigned deviceID, unsigned int size) const {
   return has_buffer;
 }
 
+int d_latency_counter = 0;
+
 void LocalInterconnect::DisplayStats() const {
   printf("Req_Network_injected_packets_num = %lld\n",
          net[REQ_NET]->packets_num);
@@ -426,6 +428,7 @@ void LocalInterconnect::DisplayStats() const {
   printf("Reply_Network_out_buffer_avg_util = %12.4f\n",
          ((float)(net[REPLY_NET]->out_buffer_util) / (net[REPLY_NET]->cycles) /
           net[REPLY_NET]->active_out_buffers));
+  printf("---------------------------dram latency------------------- %d", d_latency_counter);
 }
 
 void LocalInterconnect::DisplayOverallStats() const {}
@@ -463,6 +466,10 @@ void LocalInterconnect::DisplayState(FILE* fp) const {
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
+
+
+
+
 
 
 dxbar_router::dxbar_router(unsigned router_id, enum Interconnect_type m_type,
@@ -569,6 +576,8 @@ void dxbar_router::RR_Advance() {
             in_buffers[node_id].pop_front();
             issued[_packet.output_deviceID] = true;
             reqs++;
+          } else {
+            d_latency_counter++;
           }
         } else
           conflict_sub++;
@@ -677,6 +686,8 @@ void dxbar_router::iSLIP_Advance() {
 
               reqs++;
               break;
+            } else {
+              d_latency_counter++;
             }
           }
           
@@ -864,6 +875,7 @@ void dLocalInterconnect::DisplayStats() const {
   printf("Reply_Network_out_buffer_avg_util = %12.4f\n",
          ((float)(net[REPLY_NET]->out_buffer_util) / (net[REPLY_NET]->cycles) /
           net[REPLY_NET]->active_out_buffers));
+  
 }
 
 void dLocalInterconnect::DisplayOverallStats() const {}

@@ -197,7 +197,7 @@ static unsigned dLocalInterconnect_get_flit_size() {
 
 // booksim
 static void dintersim2_create(unsigned int n_shader, unsigned int n_mem) {
-  dg_icnt_interface->CreateInterconnect(n_shader, n_mem);
+  dg_icnt_interface->dCreateInterconnect(n_shader, n_mem);
 }
 
 static void dintersim2_init() { dg_icnt_interface->Init(); }
