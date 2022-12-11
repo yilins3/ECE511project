@@ -215,8 +215,6 @@ static void* dintersim2_pop(unsigned output, int temp) {
   return dg_icnt_interface->Pop(output, temp);
 }
 
-static void dintersim2_transfer() { dg_icnt_interface->Advance(); }
-
 static void dintersim2_transfer_dram() { dg_icnt_interface->Advance(1); }
 static void dintersim2_transfer_part() { dg_icnt_interface->Advance(0); }
 
