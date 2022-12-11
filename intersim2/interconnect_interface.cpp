@@ -674,6 +674,8 @@ void dInterconnectInterface::Push(unsigned input_deviceID, unsigned output_devic
     }
   }
 
+  subnet = temp;
+
   //TODO: Remove mem_fetch to reduce dependency
   Flit::FlitType packet_type;
   mem_fetch* mf = static_cast<mem_fetch*>(data);
@@ -712,6 +714,8 @@ void* dInterconnectInterface::Pop(unsigned deviceID, int temp)
   int subnet = 0;
   if (deviceID < _n_shader)
     subnet = 1;
+
+  subnet = temp;
 
   int turn = _round_robin_turn[subnet][icntID];
   for (int vc=0;(vc<_vcs) && (data==NULL);vc++) {
