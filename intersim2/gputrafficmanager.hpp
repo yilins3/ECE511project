@@ -60,6 +60,7 @@ public:
   
   // TODO: if it is not good...
   friend class InterconnectInterface;
+  friend class dInterconnectInterface;
   
   
   

@@ -60,6 +60,7 @@ icnt_display_state_p dram_display_state;
 icnt_get_flit_size_p dram_get_flit_size;
 
 unsigned g_network_mode;
+unsigned dram_icnt_mode;
 char* g_network_config_filename;
 
 struct inct_config g_inct_config;
@@ -243,7 +244,7 @@ void icnt_reg_options(class OptionParser* opp) {
                          "Interconnection network mode", "1");
 
   // project code ----------
-  option_parser_register(opp, "-dram_icnt_mode", OPT_INT32, &dram_icnt_mode,
+  option_parser_register(opp, "-dram_icnt_mode_1", OPT_INT32, &dram_icnt_mode,
                          "Dram Interconnect mode", "1");
   // project code end ----------
 

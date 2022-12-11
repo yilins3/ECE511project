@@ -1143,6 +1143,7 @@ void gpgpu_sim::init() {
   }
 
   if (g_network_mode) icnt_init();
+  if (dram_icnt_mode) dram_init();
 }
 
 void gpgpu_sim::update_stats() {
@@ -1184,6 +1185,17 @@ void gpgpu_sim::print_stats() {
     icnt_display_overall_stats();
     printf(
         "----------------------------END-of-Interconnect-DETAILS---------------"
+        "----------\n");
+  }
+
+  if (dram_icnt_mode) {
+    printf(
+        "----------------------------DRAM Interconnect-DETAILS----------------------"
+        "----------\n");
+    dram_display_stats();
+    dram_display_overall_stats();
+    printf(
+        "----------------------------END-of-DRAM Interconnect-DETAILS---------------"
         "----------\n");
   }
 }

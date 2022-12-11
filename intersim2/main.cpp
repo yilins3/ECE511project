@@ -63,6 +63,7 @@
 
 // Interconnect Interface instance
 InterconnectInterface *g_icnt_interface;
+dInterconnectInterface *dg_icnt_interface;
 
 /* the current traffic manager instance */
 TrafficManager * trafficManager = NULL;
