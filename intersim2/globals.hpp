@@ -41,6 +41,7 @@ Stats * GetStats(const std::string & name);
 class InterconnectInterface;
 extern InterconnectInterface *g_icnt_interface;
 
+class dInterconnectInterface;
 extern dInterconnectInterface *dg_icnt_interface;
 
 extern bool gPrintActivity;

@@ -227,7 +227,7 @@ void* InterconnectInterface::Pop(unsigned deviceID)
 
 }
 
-void InterconnectInterface::Advance(int temp)
+void InterconnectInterface::Advance()
 {
   _traffic_manager->_Step();
 }
@@ -555,7 +555,7 @@ dInterconnectInterface* dInterconnectInterface::New(const char* const config_fil
     exit (-1);
   }
   dInterconnectInterface* icnt_interface = new dInterconnectInterface();
-  icnt_interface->_icnt_config = new dIntersimConfig();
+  icnt_interface->_icnt_config = new IntersimConfig();
   icnt_interface->_icnt_config->ParseFile(config_file);
 
   return icnt_interface;
@@ -729,7 +729,7 @@ void* dInterconnectInterface::Pop(unsigned deviceID, int temp)
 
 }
 
-void dInterconnectInterface::Advance()
+void dInterconnectInterface::Advance(int temp)
 {
   _traffic_manager->_Step();
 }
