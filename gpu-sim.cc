@@ -1942,7 +1942,7 @@ void gpgpu_sim::cycle() {
   unsigned partiton_reqs_in_parallel_per_cycle = 0;
   if (clock_mask & L2) {
 
-    if (mode_flag == 1) {
+    if (dram_icnt_mode == 2) {
       dram_transfer_part();
     }
     

@@ -84,6 +84,6 @@ extern icnt_display_overall_stats_p dram_display_overall_stats;
 extern icnt_display_state_p dram_display_state;
 extern icnt_get_flit_size_p dram_get_flit_size;
 
-extern int mode_flag;
+extern unsigned dram_icnt_mode;
 
 #endif

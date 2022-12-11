@@ -241,6 +241,12 @@ static unsigned dintersim2_get_flit_size() {
 void icnt_reg_options(class OptionParser* opp) {
   option_parser_register(opp, "-network_mode", OPT_INT32, &g_network_mode,
                          "Interconnection network mode", "1");
+
+  // project code ----------
+  option_parser_register(opp, "-dram_icnt_mode", OPT_INT32, &dram_icnt_mode,
+                         "Dram Interconnect mode", "1");
+  // project code end ----------
+
   option_parser_register(opp, "-inter_config_file", OPT_CSTR,
                          &g_network_config_filename,
                          "Interconnection network config file", "mesh");
@@ -264,6 +270,42 @@ void icnt_reg_options(class OptionParser* opp) {
 
 void icnt_wrapper_init() {
 
+  switch (dram_icnt_mode) {
+    case INTERSIM:
+      dg_icnt_interface = dInterconnectInterface::New(g_network_config_filename);
+      dram_create = dintersim2_create;
+      dram_init = dintersim2_init;
+      dram_has_buffer = dintersim2_has_buffer;
+      dram_push = dintersim2_push;
+      dram_pop = dintersim2_pop;
+      dram_transfer_part = dintersim2_transfer_part;
+      dram_transfer_dram = dintersim2_transfer_dram;
+      dram_busy = dintersim2_busy;
+      dram_display_stats = dintersim2_display_stats;
+      dram_display_overall_stats = dintersim2_display_overall_stats;
+      dram_display_state = dintersim2_display_state;
+      dram_get_flit_size = dintersim2_get_flit_size;
+      break;
+    case LOCAL_XBAR:
+      dram_interface = dLocalInterconnect::New(g_inct_config);
+      dram_create = dLocalInterconnect_create;
+      dram_init = dLocalInterconnect_init;
+      dram_has_buffer = dLocalInterconnect_has_buffer;
+      dram_push = dLocalInterconnect_push;
+      dram_pop = dLocalInterconnect_pop;
+      dram_transfer_part = dLocalInterconnect_transfer_part;
+      dram_transfer_dram = dLocalInterconnect_transfer_dram;
+      dram_busy = dLocalInterconnect_busy;
+      dram_display_stats = dLocalInterconnect_display_stats;
+      dram_display_overall_stats = dLocalInterconnect_display_overall_stats;
+      dram_display_state = dLocalInterconnect_display_state;
+      dram_get_flit_size = dLocalInterconnect_get_flit_size;
+      break;
+    default:
+      assert(0);
+      break;
+  }
+
 
 
   switch (g_network_mode) {
@@ -281,23 +323,6 @@ void icnt_wrapper_init() {
       icnt_display_overall_stats = intersim2_display_overall_stats;
       icnt_display_state = intersim2_display_state;
       icnt_get_flit_size = intersim2_get_flit_size;
-
-      dg_icnt_interface = dInterconnectInterface::New(g_network_config_filename);
-      dram_create = dintersim2_create;
-      dram_init = dintersim2_init;
-      dram_has_buffer = dintersim2_has_buffer;
-      dram_push = dintersim2_push;
-      dram_pop = dintersim2_pop;
-      dram_transfer_part = dintersim2_transfer_part;
-      dram_transfer_dram = dintersim2_transfer_dram;
-      dram_busy = dintersim2_busy;
-      dram_display_stats = dintersim2_display_stats;
-      dram_display_overall_stats = dintersim2_display_overall_stats;
-      dram_display_state = dintersim2_display_state;
-      dram_get_flit_size = dintersim2_get_flit_size;
-
-      mode_flag = 0;
-
       break;
     case LOCAL_XBAR:
       g_localicnt_interface = LocalInterconnect::New(g_inct_config);
@@ -312,24 +337,6 @@ void icnt_wrapper_init() {
       icnt_display_overall_stats = LocalInterconnect_display_overall_stats;
       icnt_display_state = LocalInterconnect_display_state;
       icnt_get_flit_size = LocalInterconnect_get_flit_size;
-
-
-      dram_interface = dLocalInterconnect::New(g_inct_config);
-      dram_create = dLocalInterconnect_create;
-      dram_init = dLocalInterconnect_init;
-      dram_has_buffer = dLocalInterconnect_has_buffer;
-      dram_push = dLocalInterconnect_push;
-      dram_pop = dLocalInterconnect_pop;
-      dram_transfer_part = dLocalInterconnect_transfer_part;
-      dram_transfer_dram = dLocalInterconnect_transfer_dram;
-      dram_busy = dLocalInterconnect_busy;
-      dram_display_stats = dLocalInterconnect_display_stats;
-      dram_display_overall_stats = dLocalInterconnect_display_overall_stats;
-      dram_display_state = dLocalInterconnect_display_state;
-      dram_get_flit_size = dLocalInterconnect_get_flit_size;
-
-      mode_flag = 1;
-
       break;
     default:
       assert(0);
