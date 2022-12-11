@@ -1928,7 +1928,7 @@ void gpgpu_sim::cycle() {
 
   if (clock_mask & DRAM) {
 
-    dram_transfer_dram();
+    //dram_transfer_dram();
 
     for (unsigned i = 0; i < m_memory_config->m_n_mem; i++) {
       if (m_memory_config->simple_dram_model)
@@ -1954,9 +1954,9 @@ void gpgpu_sim::cycle() {
   unsigned partiton_reqs_in_parallel_per_cycle = 0;
   if (clock_mask & L2) {
 
-    if (dram_icnt_mode == 2) {
-      dram_transfer_part();
-    }
+    // if (dram_icnt_mode == 2) {
+    //   dram_transfer_part();
+    // }
     
     m_power_stats->pwr_mem_stat->l2_cache_stats[CURRENT_STAT_IDX].clear();
     for (unsigned i = 0; i < m_memory_config->m_n_mem_sub_partition; i++) {
@@ -1984,6 +1984,9 @@ void gpgpu_sim::cycle() {
 
   if (clock_mask & ICNT) {
     icnt_transfer();
+
+    dram_transfer_dram();
+    dram_transfer_part();
   }
 
   if (clock_mask & CORE) {

@@ -321,7 +321,8 @@ void memory_partition_unit::dram_cycle() {
 
         // interconnect <- DRAM return queue
         unsigned response_size = mf_return->get_is_write() ? mf_return->get_ctrl_size() : mf_return->size();
-        unsigned set_size = response_size;
+        //printf("--------------dram response size %d ---------------\n",response_size);
+        unsigned set_size = 1024;
         ::dram_push(m_id + m_config->m_n_mem_sub_partition, dest_global_spid, mf_return, set_size, 1);
         mf_return->set_status(IN_DRAM_INTERCONNECT, m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle);
 
@@ -364,7 +365,7 @@ void memory_partition_unit::dram_cycle() {
       // l2-Dram q -> interconnect 
       unsigned response_size = mf->get_is_write() ? mf->get_ctrl_size() : mf->size();
       unsigned dest_global_spid1 = mf->get_sub_partition_id();
-      unsigned set_size = response_size;
+      unsigned set_size = 1024;
       ::dram_push(dest_global_spid1, m_id + m_config->m_n_mem_sub_partition, mf, set_size, 0);
 
       //printf("------response size l2-dram q -> interconnect = %d --------\n", response_size);
