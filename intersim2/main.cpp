@@ -86,9 +86,21 @@ int GetSimTime() {
   return g_icnt_interface->GetIcntTime();
 }
 
+int dGetSimTime() {
+  return dg_icnt_interface->GetIcntTime();
+}
+
 class Stats;
 Stats * GetStats(const std::string & name) {
   Stats* test =  g_icnt_interface->GetIcntStats(name);
+  if(test == 0){
+    cout<<"warning statistics "<<name<<" not found"<<endl;
+  }
+  return test;
+}
+
+Stats * dGetStats(const std::string & name) {
+  Stats* test =  dg_icnt_interface->GetIcntStats(name);
   if(test == 0){
     cout<<"warning statistics "<<name<<" not found"<<endl;
   }

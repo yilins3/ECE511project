@@ -83,12 +83,12 @@ static bool intersim2_has_buffer(unsigned input, unsigned int size) {
 }
 
 static void intersim2_push(unsigned input, unsigned output, void* data,
-                           unsigned int size) {
-  g_icnt_interface->Push(input, output, data, size);
+                           unsigned int size, int temp) {
+  g_icnt_interface->Push(input, output, data, size, temp);
 }
 
-static void* intersim2_pop(unsigned output) {
-  return g_icnt_interface->Pop(output);
+static void* intersim2_pop(unsigned output, int temp) {
+  return g_icnt_interface->Pop(output, temp);
 }
 
 static void intersim2_transfer() { g_icnt_interface->Advance(); }
@@ -209,15 +209,15 @@ static bool dintersim2_has_buffer(unsigned input, unsigned int size) {
 
 static void dintersim2_push(unsigned input, unsigned output, void* data,
                            unsigned int size, int temp) {
-  dg_icnt_interface->Push(input, output, data, size, temp);
+  g_icnt_interface->Push(input, output, data, size, temp);
 }
 
 static void* dintersim2_pop(unsigned output, int temp) {
-  return dg_icnt_interface->Pop(output, temp);
+  return g_icnt_interface->Pop(output, temp);
 }
 
-static void dintersim2_transfer_dram() { dg_icnt_interface->Advance(1); }
-static void dintersim2_transfer_part() { dg_icnt_interface->Advance(0); }
+static void dintersim2_transfer_dram() { g_icnt_interface->Advance(); }
+static void dintersim2_transfer_part() { }
 
 static bool dintersim2_busy() { return dg_icnt_interface->Busy(); }
 
@@ -273,20 +273,21 @@ void icnt_wrapper_init() {
 
   switch (dram_icnt_mode) {
     case INTERSIM:
-      dg_icnt_interface = dInterconnectInterface::New(g_network_config_filename);
-      dram_create = dintersim2_create;
-      dram_init = dintersim2_init;
-      dram_has_buffer = dintersim2_has_buffer;
+      g_icnt_interface = InterconnectInterface::New(g_network_config_filename);
+      dram_create = intersim2_create;
+      dram_init = intersim2_init;
+      dram_has_buffer = intersim2_has_buffer;
       dram_push = dintersim2_push;
       dram_pop = dintersim2_pop;
       dram_transfer_part = dintersim2_transfer_part;
       dram_transfer_dram = dintersim2_transfer_dram;
-      dram_busy = dintersim2_busy;
-      dram_display_stats = dintersim2_display_stats;
-      dram_display_overall_stats = dintersim2_display_overall_stats;
-      dram_display_state = dintersim2_display_state;
-      dram_get_flit_size = dintersim2_get_flit_size;
+      dram_busy = intersim2_busy;
+      dram_display_stats = intersim2_display_stats;
+      dram_display_overall_stats = intersim2_display_overall_stats;
+      dram_display_state = intersim2_display_state;
+      dram_get_flit_size = intersim2_get_flit_size;
       break;
+
     case LOCAL_XBAR:
       dram_interface = dLocalInterconnect::New(g_inct_config);
       dram_create = dLocalInterconnect_create;
@@ -312,18 +313,18 @@ void icnt_wrapper_init() {
   switch (g_network_mode) {
     case INTERSIM:
       // FIXME: delete the object: may add icnt_done wrapper
-      g_icnt_interface = InterconnectInterface::New(g_network_config_filename);
-      icnt_create = intersim2_create;
-      icnt_init = intersim2_init;
-      icnt_has_buffer = intersim2_has_buffer;
-      icnt_push = intersim2_push;
-      icnt_pop = intersim2_pop;
-      icnt_transfer = intersim2_transfer;
-      icnt_busy = intersim2_busy;
-      icnt_display_stats = intersim2_display_stats;
-      icnt_display_overall_stats = intersim2_display_overall_stats;
-      icnt_display_state = intersim2_display_state;
-      icnt_get_flit_size = intersim2_get_flit_size;
+      // g_icnt_interface = InterconnectInterface::New(g_network_config_filename);
+      // icnt_create = intersim2_create;
+      // icnt_init = intersim2_init;
+      // icnt_has_buffer = intersim2_has_buffer;
+      // icnt_push = intersim2_push;
+      // icnt_pop = intersim2_pop;
+      // icnt_transfer = intersim2_transfer;
+      // icnt_busy = intersim2_busy;
+      // icnt_display_stats = intersim2_display_stats;
+      // icnt_display_overall_stats = intersim2_display_overall_stats;
+      // icnt_display_state = intersim2_display_state;
+      // icnt_get_flit_size = intersim2_get_flit_size;
       break;
     case LOCAL_XBAR:
       g_localicnt_interface = LocalInterconnect::New(g_inct_config);

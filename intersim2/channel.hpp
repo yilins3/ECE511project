@@ -63,8 +63,10 @@ public:
   virtual T * Receive(); 
   
   virtual void ReadInputs();
+  virtual void dReadInputs();
   virtual void Evaluate() {}
   virtual void WriteOutputs();
+  virtual void dWriteOutputs();
 
 protected:
   int _delay;
@@ -106,6 +108,14 @@ void Channel<T>::ReadInputs() {
 }
 
 template<typename T>
+void Channel<T>::dReadInputs() {
+  if(_input) {
+    _wait_queue.push(make_pair(dGetSimTime() + _delay - 1, _input));
+    _input = 0;
+  }
+}
+
+template<typename T>
 void Channel<T>::WriteOutputs() {
   _output = 0;
   if(_wait_queue.empty()) {
@@ -121,5 +131,23 @@ void Channel<T>::WriteOutputs() {
   assert(_output);
   _wait_queue.pop();
 }
+
+template<typename T>
+void Channel<T>::dWriteOutputs() {
+  _output = 0;
+  if(_wait_queue.empty()) {
+    return;
+  }
+  pair<int, T *> const & item = _wait_queue.front();
+  int const & time = item.first;
+  if(dGetSimTime() < time) {
+    return;
+  }
+  assert(dGetSimTime() == time);
+  _output = item.second;
+  assert(_output);
+  _wait_queue.pop();
+}
+
 
 #endif

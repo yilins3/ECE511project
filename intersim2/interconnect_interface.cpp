@@ -144,9 +144,12 @@ void InterconnectInterface::Init()
   //       _boundary_buffer, _ejection_buffer and _ejected_flit_queue should be cleared
 }
 
-void InterconnectInterface::Push(unsigned input_deviceID, unsigned output_deviceID, void *data, unsigned int size)
+void InterconnectInterface::Push(unsigned input_deviceID, unsigned output_deviceID, void *data, unsigned int size, int temp)
 {
   // it should have free buffer
+
+  //std::cout << "dram push in interconnect_interface.cpp start" << std::endl;
+
   assert(HasBuffer(input_deviceID, size));
 
   DPRINTF(INTERCONNECT, "Sent %d bytes from %d to %d", size, input_deviceID, output_deviceID);
@@ -170,7 +173,10 @@ void InterconnectInterface::Push(unsigned input_deviceID, unsigned output_device
     } else {
       subnet = 1;
     }
+    subnet = temp;
   }
+
+  //std::cout << "dram push in interconnect_interface.cpp 1" << std::endl;
 
   //TODO: Remove mem_fetch to reduce dependency
   Flit::FlitType packet_type;
@@ -187,17 +193,19 @@ void InterconnectInterface::Push(unsigned input_deviceID, unsigned output_device
     		assert (0 && "Type is undefined");
     	}
   }
+  //std::cout << "dram push in interconnect_interface.cpp 2" << std::endl;
 
   //TODO: _include_queuing ?
   _traffic_manager->_GeneratePacket( input_icntID, -1, 0 /*class*/, _traffic_manager->_time, subnet, n_flits, packet_type, data, output_icntID);
 
+//std::cout << "dram push in interconnect_interface.cpp end" << std::endl;
 #if DOUB
   cout <<"Traffic[" << subnet << "] (mapped) sending form "<< input_icntID << " to " << output_icntID << endl;
 #endif
 //  }
 }
 
-void* InterconnectInterface::Pop(unsigned deviceID)
+void* InterconnectInterface::Pop(unsigned deviceID, int temp)
 {
   int icntID = _node_map[deviceID];
 #if DEBUG
@@ -210,6 +218,7 @@ void* InterconnectInterface::Pop(unsigned deviceID)
   int subnet = 0;
   if (deviceID < _n_shader)
     subnet = 1;
+  subnet = temp;
 
   int turn = _round_robin_turn[subnet][icntID];
   for (int vc=0;(vc<_vcs) && (data==NULL);vc++) {
@@ -260,8 +269,17 @@ bool InterconnectInterface::Busy() const
 bool InterconnectInterface::HasBuffer(unsigned deviceID, unsigned int size) const
 {
   bool has_buffer = false;
+
+  //std::cout << "device ID = " << deviceID  << " size = " << size << std::endl;
   unsigned int n_flits = size / _flit_size + ((size % _flit_size)? 1:0);
   int icntID = _node_map.find(deviceID)->second;
+
+  // std::cout << "icntID = " << icntID << std::endl;
+  //   std::cout << "_input_buffer_capacity = " << _input_buffer_capacity << std::endl;
+  //   std::cout << "_flit_size = " << _flit_size << std::endl;
+  //   std::cout << "n_flits = " << n_flits << std::endl;
+  //   std::cout << "cur size w/n_flits = " <<_traffic_manager->_input_queue[0][icntID][0].size() +n_flits << std::endl;
+
 
   has_buffer = _traffic_manager->_input_queue[0][icntID][0].size() +n_flits <= _input_buffer_capacity;
 
@@ -735,7 +753,7 @@ void* dInterconnectInterface::Pop(unsigned deviceID, int temp)
 
 void dInterconnectInterface::Advance(int temp)
 {
-  _traffic_manager->_Step();
+  _traffic_manager->_dStep();
 }
 
 bool dInterconnectInterface::Busy() const

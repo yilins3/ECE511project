@@ -1934,8 +1934,7 @@ void gpgpu_sim::cycle() {
       if (m_memory_config->simple_dram_model)
         m_memory_partition_unit[i]->simple_dram_model_cycle();
       else
-        m_memory_partition_unit[i]
-            ->dram_cycle();  // Issue the dram command (scheduler + delay model)
+        m_memory_partition_unit[i]->dram_cycle();  // Issue the dram command (scheduler + delay model)
       // Update performance counters for DRAM
       m_memory_partition_unit[i]->set_dram_power_stats(
           m_power_stats->pwr_mem_stat->n_cmd[CURRENT_STAT_IDX][i],
@@ -1985,11 +1984,18 @@ void gpgpu_sim::cycle() {
   if (clock_mask & ICNT) {
     icnt_transfer();
 
+    //std::cout << "transfer start" << std::endl;
     dram_transfer_dram();
-    dram_transfer_part();
+    if (dram_icnt_mode == 2) {
+      //std::cout << "dram = local, start dram_transfer_part()" <<std::endl;
+      dram_transfer_part();
+    }
+    //std::cout << "transfer end" << std::endl;
+    
   }
 
   if (clock_mask & CORE) {
+    //std::cout << "core clock start" << std::endl;
     // L1 cache + shader core pipeline stages
     m_power_stats->pwr_mem_stat->core_cache_stats[CURRENT_STAT_IDX].clear();
     for (unsigned i = 0; i < m_shader_config->n_simt_clusters; i++) {
@@ -2023,6 +2029,8 @@ void gpgpu_sim::cycle() {
     gpu_sim_cycle++;
 
     if (g_interactive_debugger_enabled) gpgpu_debug();
+
+    //std::cout << "core clock end" << std::endl;
 
       // McPAT main cycle (interface with McPAT)
 #ifdef GPGPUSIM_POWER_MODEL

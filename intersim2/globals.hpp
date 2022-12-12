@@ -34,6 +34,7 @@
 /*all declared in main.cpp*/
 
 int GetSimTime();
+int dGetSimTime();
 
 class Stats;
 Stats * GetStats(const std::string & name);

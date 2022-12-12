@@ -307,6 +307,7 @@ void memory_partition_unit::simple_dram_model_cycle() {
 void memory_partition_unit::dram_cycle() {
   // pop completed memory request from dram and push it to dram-to-L2 queue
   // of the original sub partition
+  //std::cout<< "here1" << std::endl;
   mem_fetch *mf_return = m_dram->return_queue_top();
   if (mf_return) {
     unsigned dest_global_spid = mf_return->get_sub_partition_id();
@@ -322,7 +323,8 @@ void memory_partition_unit::dram_cycle() {
         // interconnect <- DRAM return queue
         unsigned response_size = mf_return->get_is_write() ? mf_return->get_ctrl_size() : mf_return->size();
         //printf("--------------dram response size %d ---------------\n",response_size);
-        unsigned set_size = 1024;
+        //std::cout<< "------1mid " << m_id << " # of sub partition = " << m_config->m_n_mem_sub_partition << "--------" << std::endl;
+        unsigned set_size = response_size;
         ::dram_push(m_id + m_config->m_n_mem_sub_partition, dest_global_spid, mf_return, set_size, 1);
         mf_return->set_status(IN_DRAM_INTERCONNECT, m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle);
 
@@ -365,10 +367,10 @@ void memory_partition_unit::dram_cycle() {
       // l2-Dram q -> interconnect 
       unsigned response_size = mf->get_is_write() ? mf->get_ctrl_size() : mf->size();
       unsigned dest_global_spid1 = mf->get_sub_partition_id();
-      unsigned set_size = 1024;
+      unsigned set_size = response_size;
+      //std::cout<< "------2mid " << m_id << " # of sub partition = " << m_config->m_n_mem_sub_partition << "--------" << std::endl;
       ::dram_push(dest_global_spid1, m_id + m_config->m_n_mem_sub_partition, mf, set_size, 0);
-
-      //printf("------response size l2-dram q -> interconnect = %d --------\n", response_size);
+      //std::cout << "dram push done" << std::endl;
 
       mf->set_status(IN_DRAM_INTERCONNECT, m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle);
 
@@ -390,6 +392,7 @@ void memory_partition_unit::dram_cycle() {
   for (int i = 0; i < m_config->m_n_sub_partition_per_memory_channel; i++) {
 
     // Dram-L2 queue <- interconnect
+    //std::cout<< "------3mid " << m_id << " # of sub partition = " << m_config->m_n_mem_sub_partition << "--------" << std::endl;
     mem_fetch *mf_l2 = (mem_fetch *)::dram_pop(m_id*m_config->m_n_sub_partition_per_memory_channel+i, 1);
     if(mf_l2){
       unsigned dest_global_spid = mf_l2->get_sub_partition_id();
@@ -400,6 +403,7 @@ void memory_partition_unit::dram_cycle() {
   }
 
   // interconnect -> DramLatency queue
+  //std::cout<< "------4mid " << m_id << " # of sub partition = " << m_config->m_n_mem_sub_partition << "--------" << std::endl;
   mem_fetch *mf_latency = (mem_fetch *)::dram_pop(m_id + m_config->m_n_mem_sub_partition, 0);
   if(mf_latency){
     dram_delay_t d;
@@ -407,6 +411,7 @@ void memory_partition_unit::dram_cycle() {
     d.ready_cycle = m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle + m_config->dram_latency;
     m_dram_latency_queue.push_back(d);
   }
+  //std::cout << "here2" << std::endl;
 
   // DRAM latency queue
   if (!m_dram_latency_queue.empty() &&
